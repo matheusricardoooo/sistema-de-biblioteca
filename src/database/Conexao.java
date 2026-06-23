@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.io.FileInputStream;
 
 public class Conexao {
 
@@ -19,8 +20,7 @@ public class Conexao {
             Properties prop = new Properties();
 
             InputStream input =
-                    Conexao.class.getClassLoader()
-                            .getResourceAsStream("config.properties");
+                    new FileInputStream("src/database/config.properties");
 
             if (input == null) {
                 throw new RuntimeException("Arquivo config.properties não encontrado.");
