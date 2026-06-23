@@ -1,23 +1,54 @@
 package database;
 
-import java.sql.Connection; // import para conexão do banco de dados e o java
-import java.sql.DriverManager; // import responsável pela abertura da conexão
-import java.sql.SQLException; // import responsável pela exibição do erros ao banco de dados
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Properties;
 
-public class Conexao { // linha que declara o método
-    private static final String URL = "jdbc:postgresql://localhost:5432/biblioteca";
-    private static final String USUARIO = "postgres";
-    private static final String SENHA = "6284387";
+public class Conexao {
+
+    private static String URL;
+    private static String USUARIO;
+    private static String SENHA;
+
+    // Executa uma única vez quando a classe é carregada
+    static {
+        try {
+            Properties prop = new Properties();
+
+            InputStream input =
+                    Conexao.class.getClassLoader()
+                            .getResourceAsStream("config.properties");
+
+            if (input == null) {
+                throw new RuntimeException("Arquivo config.properties não encontrado.");
+            }
+
+            prop.load(input);
+
+            URL = prop.getProperty("url");
+            USUARIO = prop.getProperty("usuario");
+            SENHA = prop.getProperty("senha");
+
+        } catch (IOException e) {
+            throw new RuntimeException(
+                    "Erro ao carregar o arquivo config.properties",
+                    e
+            );
+        }
+    }
 
     public static Connection conectar() {
+        try {
+            return DriverManager.getConnection(
+                    URL,
+                    USUARIO,
+                    SENHA
+            );
 
-        try { // (tente executar este código, caso der erro, parta para o catch)
-            // aqui ele faz a verificação dos itens do url, usuario e senha
-            Connection conn = DriverManager.getConnection(URL, USUARIO, SENHA); //
-            return conn;
-        }
-
-        catch (SQLException e) { // serve para avisar que houve um erro
+        } catch (SQLException e) {
             throw new RuntimeException(
                     "Erro ao conectar com o banco de dados",
                     e
